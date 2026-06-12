@@ -48,6 +48,8 @@ export const adminAPI = {
   getAllDoctors: () => api.get("/admin/doctors"),
   addDoctor: (data) => api.post("/admin/doctors/add", data),
   deleteDoctor: (id) => api.delete(`/admin/doctors/delete/${id}`),
+  updateDoctor: (id, data) => api.put(`/admin/doctors/update/${id}`, data),
+  updatePatient: (id, data) => api.put(`/admin/patients/update/${id}`, data),
   getAllPatients: () => api.get("/admin/patients"),
   getAllAppointments: () => api.get("/admin/appointments"),
 };

@@ -22,6 +22,19 @@ function AdminDoctors() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
+  // Update modal state
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [updateData, setUpdateData] = useState({
+    id: "",
+    specialization: "",
+    experience: "",
+    fees: "",
+    availableDays: "",
+    availableTime: "",
+  });
+  const [updateError, setUpdateError] = useState("");
+  const [updating, setUpdating] = useState(false);
+
   useEffect(() => {
     fetchDoctors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,7 +65,6 @@ function AdminDoctors() {
     e.preventDefault();
     setSubmitting(true);
     setFormError("");
-
     try {
       await adminAPI.addDoctor(formData);
       setMessage("Doctor added successfully!");
@@ -85,6 +97,46 @@ function AdminDoctors() {
       } catch (err) {
         setMessage("Failed to delete doctor!");
       }
+    }
+  };
+
+  // Open update form with doctor's existing data
+  const handleEditClick = (doc) => {
+    setUpdateData({
+      id: doc.id,
+      specialization: doc.specialization || "",
+      experience: doc.experience || "",
+      fees: doc.fees || "",
+      availableDays: doc.availableDays || "",
+      availableTime: doc.availableTime || "",
+    });
+    setUpdateError("");
+    setShowUpdateForm(true);
+  };
+
+  const handleUpdateChange = (e) => {
+    setUpdateData({ ...updateData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    setUpdateError("");
+    try {
+      await adminAPI.updateDoctor(updateData.id, {
+        specialization: updateData.specialization,
+        experience: updateData.experience,
+        fees: updateData.fees,
+        availableDays: updateData.availableDays,
+        availableTime: updateData.availableTime,
+      });
+      setMessage("Doctor updated successfully!");
+      setShowUpdateForm(false);
+      fetchDoctors();
+    } catch (err) {
+      setUpdateError("Failed to update doctor!");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -246,6 +298,132 @@ function AdminDoctors() {
           </div>
         )}
 
+        {/* Update Doctor Modal */}
+        {showUpdateForm && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              background: "rgba(0,0,0,0.5)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                background: "white",
+                borderRadius: "10px",
+                padding: "30px",
+                width: "500px",
+                maxWidth: "90%",
+                maxHeight: "90vh",
+                overflowY: "auto",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "20px",
+                }}
+              >
+                <h3>✏️ Update Doctor</h3>
+                <button
+                  onClick={() => setShowUpdateForm(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {updateError && (
+                <div className="alert alert-error">{updateError}</div>
+              )}
+
+              <form onSubmit={handleUpdateSubmit}>
+                <div className="form-group">
+                  <label>Specialization</label>
+                  <input
+                    type="text"
+                    name="specialization"
+                    value={updateData.specialization}
+                    onChange={handleUpdateChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Experience (years)</label>
+                  <input
+                    type="text"
+                    name="experience"
+                    value={updateData.experience}
+                    onChange={handleUpdateChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Consultation Fees (₹)</label>
+                  <input
+                    type="number"
+                    name="fees"
+                    value={updateData.fees}
+                    onChange={handleUpdateChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Available Days</label>
+                  <input
+                    type="text"
+                    name="availableDays"
+                    placeholder="e.g. Mon, Wed, Fri"
+                    value={updateData.availableDays}
+                    onChange={handleUpdateChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Available Time</label>
+                  <input
+                    type="text"
+                    name="availableTime"
+                    placeholder="e.g. 10:00 AM - 4:00 PM"
+                    value={updateData.availableTime}
+                    onChange={handleUpdateChange}
+                  />
+                </div>
+                <div
+                  style={{ display: "flex", gap: "10px", marginTop: "10px" }}
+                >
+                  <button
+                    type="submit"
+                    className="btn btn-success"
+                    style={{ width: "auto", flex: 1 }}
+                    disabled={updating}
+                  >
+                    {updating ? "Updating..." : "✅ Update Doctor"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    style={{ width: "auto", flex: 1 }}
+                    onClick={() => setShowUpdateForm(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* Doctors Table */}
         {doctors.length === 0 ? (
           <div className="card">
@@ -277,7 +455,13 @@ function AdminDoctors() {
                   <td>₹{doc.fees}</td>
                   <td>{doc.availableDays || "-"}</td>
                   <td>{doc.availableTime || "-"}</td>
-                  <td>
+                  <td style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      className="btn btn-warning"
+                      onClick={() => handleEditClick(doc)}
+                    >
+                      Update
+                    </button>
                     <button
                       className="btn btn-danger"
                       onClick={() => handleDelete(doc.id)}

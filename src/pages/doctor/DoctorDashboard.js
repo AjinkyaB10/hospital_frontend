@@ -60,7 +60,24 @@ function DoctorDashboard() {
 
         {/* Doctor Info */}
         <div className="card">
-          <h3 style={{ marginBottom: "15px" }}>Profile Summary</h3>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "15px",
+            }}
+          >
+            <h3>Profile Summary</h3>
+            <Link to="/doctor/profile">
+              <button
+                className="btn btn-primary"
+                style={{ width: "auto", padding: "8px 18px", fontSize: "14px" }}
+              >
+                ✏️ Edit Profile
+              </button>
+            </Link>
+          </div>
           <table>
             <tbody>
               <tr>
@@ -69,7 +86,6 @@ function DoctorDashboard() {
                 </td>
                 <td>{profile?.specialization || "-"}</td>
               </tr>
-
               <tr>
                 <td>
                   <strong>Experience</strong>

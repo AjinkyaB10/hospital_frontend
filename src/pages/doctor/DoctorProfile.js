@@ -5,9 +5,7 @@ import { doctorAPI } from "../../services/api";
 function DoctorProfile() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    phone: "",
     specialization: "",
-    qualification: "",
     experience: "",
     fees: "",
     availableDays: "",
@@ -25,9 +23,7 @@ function DoctorProfile() {
         const response = await doctorAPI.getProfile();
         const p = response.data;
         setFormData({
-          phone: p.phone || "",
           specialization: p.specialization || "",
-          qualification: p.qualification || "",
           experience: p.experience || "",
           fees: p.fees || "",
           availableDays: p.availableDays || "",
@@ -102,34 +98,12 @@ function DoctorProfile() {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Phone</label>
-              <input
-                type="text"
-                name="phone"
-                placeholder="Enter phone number"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
               <label>Specialization</label>
               <input
                 type="text"
                 name="specialization"
                 placeholder="e.g. Cardiologist"
                 value={formData.specialization}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Qualification</label>
-              <input
-                type="text"
-                name="qualification"
-                placeholder="e.g. MBBS, MD"
-                value={formData.qualification}
                 onChange={handleChange}
               />
             </div>
